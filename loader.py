@@ -22,7 +22,7 @@ def load_sentences(path, lower, zeros):
                 sentence = []
         else:
             word = line.split()
-            #assert len(word) >= 2
+            assert len(word) >= 2
             sentence.append(word)
     if len(sentence) > 0:
         if 'DOCSTART' not in sentence[0][0]:
@@ -183,8 +183,8 @@ def augment_with_pretrained(dictionary, ext_emb_path, words):
         for word in words:
             if any(x in pretrained for x in [
                 word,
-                word.lower()#,
-                #re.sub('\d', '0', word.lower())
+                word.lower(),
+                re.sub('\d', '0', word.lower())
             ]) and word not in dictionary:
                 dictionary[word] = 0
 
