@@ -198,6 +198,8 @@ def create_input(data, parameters, add_label, singletons=None):
     chars = data['chars']
     if singletons is not None:
         words = insert_singletons(words, singletons)
+    if parameters['gaz_dim']:
+        gaz = data['gazetteers']
     if parameters['cap_dim']:
         caps = data['caps']
     char_for, char_rev, char_pos = pad_word_chars(chars)
@@ -213,6 +215,8 @@ def create_input(data, parameters, add_label, singletons=None):
         input.append(caps)
     if add_label:
         input.append(data['tags'])
+    if parameters['gaz_dim']:
+        input.append(gaz)
     return input
 
 
