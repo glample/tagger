@@ -3,6 +3,7 @@ import re
 import codecs
 from utils import create_dico, create_mapping, zero_digits
 from utils import iob2, iob_iobes
+import numpy as np
 
 
 def load_sentences(path, lower, zeros):
@@ -21,11 +22,12 @@ def load_sentences(path, lower, zeros):
                 sentence = []
         else:
             word = line.split()
-            assert len(word) >= 2
+            #assert len(word) >= 2
             sentence.append(word)
     if len(sentence) > 0:
         if 'DOCSTART' not in sentence[0][0]:
             sentences.append(sentence)
+
     return sentences
 
 
@@ -181,10 +183,49 @@ def augment_with_pretrained(dictionary, ext_emb_path, words):
         for word in words:
             if any(x in pretrained for x in [
                 word,
-                word.lower(),
-                re.sub('\d', '0', word.lower())
+                word.lower()#,
+                #re.sub('\d', '0', word.lower())
             ]) and word not in dictionary:
                 dictionary[word] = 0
 
     word_to_id, id_to_word = create_mapping(dictionary)
     return dictionary, word_to_id, id_to_word
+
+def load_gazetteers(gaz_path):
+    """
+    Load extra gazetteers.
+    """
+    lines = [line.rstrip() for line in open(gaz_path, 'r')]
+    gazetteers = {}
+    tags = {}
+    for line in lines:
+        split = line.split("\t")
+        assert len(split) >= 2
+        category, gazetteer = " ".join(split[-1:]), " ".join(split[:-1])
+        if category not in tags:
+            tags[category] = 1
+
+        if gazetteer not in gazetteers:
+            gazetteers[gazetteer] = []
+            gazetteers[gazetteer].append(category)
+        else:
+            cat = gazetteers[gazetteer]
+            if category not in cat:
+                gazetteers[gazetteer].append(category)
+    return gazetteers,tags.keys()
+
+def add_gazetteers(data, token_to_gazetteers, index_to_token,gaz_tags):
+    """
+    Add gazetteers features to data.
+    """
+    #tags = ['LOC', 'MISC', 'ORG', 'PER']
+    tags = gaz_tags
+    for sentence in data:
+        sentence['gazetteers'] = [np.zeros(len(tags), dtype=np.int32) for _ in xrange(len(sentence['words']))]
+        for i, token_id in enumerate(sentence['words']):
+            token = index_to_token[token_id].lower()
+            if token in token_to_gazetteers:
+                values = set(token_to_gazetteers[token])
+            for j,tag in enumerate(tags):
+                if tag in values:
+                    np.put(sentence['gazetteers'][i],[j],[1])
