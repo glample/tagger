@@ -92,6 +92,14 @@ optparser.add_option(
     "-r", "--reload", default="0",
     type='int', help="Reload the last saved model"
 )
+optparser.add_option(
+    "-G", "--gaz_path",default="",
+    help="Gazetteers dimension"
+)
+optparser.add_option(
+    "-g", "--gaz_dim", default="5",
+    help="Gazetteers dimension"
+)
 opts = optparser.parse_args()[0]
 
 # Parse parameters
@@ -111,18 +119,19 @@ parameters['cap_dim'] = opts.cap_dim
 parameters['crf'] = opts.crf == 1
 parameters['dropout'] = opts.dropout
 parameters['lr_method'] = opts.lr_method
-
+parameters['gaz_dim'] = opts.gaz_dim
+parameters['gaz_path'] = opts.gaz_path
 # Check parameters validity
 assert os.path.isfile(opts.train)
 assert os.path.isfile(opts.dev)
 assert os.path.isfile(opts.test)
+assert os.path.isfile(opts.gaz_path)
 assert parameters['char_dim'] > 0 or parameters['word_dim'] > 0
 assert 0. <= parameters['dropout'] < 1.0
 assert parameters['tag_scheme'] in ['iob', 'iobes']
 assert not parameters['all_emb'] or parameters['pre_emb']
 assert not parameters['pre_emb'] or parameters['word_dim'] > 0
 assert not parameters['pre_emb'] or os.path.isfile(parameters['pre_emb'])
-
 # Check evaluation script / folders
 if not os.path.isfile(eval_script):
     raise Exception('CoNLL evaluation script not found at "%s"' % eval_script)
@@ -183,6 +192,17 @@ test_data = prepare_dataset(
 print "%i / %i / %i sentences in train / dev / test." % (
     len(train_data), len(dev_data), len(test_data))
 
+if parameters['gaz_dim']:
+    '''1: read from gazetteers file with the format: <gazeetteer <list of categories>>
+       2: once we read the gazetteers, we create a one-hot-encoding gazetteer vector 
+       for every word in the sentence. The length of vector is equal to no of categories
+       and add the gazetteer feature vector for every word
+    '''
+    gazetteers_dataset,gaz_tags = loader.load_gazetteers(parameters['gaz_path'])
+    parameters['gaz_dim'] = len(gaz_tags)
+    loader.add_gazetteers(train_data, gazetteers_dataset, id_to_word,gaz_tags)
+    loader.add_gazetteers(dev_data, gazetteers_dataset, id_to_word,gaz_tags)
+    loader.add_gazetteers(test_data, gazetteers_dataset, id_to_word,gaz_tags)
 # Save the mappings to disk
 print 'Saving the mappings to disk...'
 model.save_mappings(id_to_word, id_to_char, id_to_tag)
