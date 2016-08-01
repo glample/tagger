@@ -194,6 +194,10 @@ def augment_with_pretrained(dictionary, ext_emb_path, words):
 def load_gazetteers(gaz_path):
     """
     Load extra gazetteers.
+    each line consists of two fields
+    gazetteer<tab><category>
+    we could have same gazetteer with multiple categories, but they should appear in
+    different lines
     """
     lines = [line.rstrip() for line in open(gaz_path, 'r')]
     gazetteers = {}
