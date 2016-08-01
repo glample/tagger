@@ -125,13 +125,13 @@ parameters['gaz_path'] = opts.gaz_path
 assert os.path.isfile(opts.train)
 assert os.path.isfile(opts.dev)
 assert os.path.isfile(opts.test)
-assert os.path.isfile(opts.gaz_path)
 assert parameters['char_dim'] > 0 or parameters['word_dim'] > 0
 assert 0. <= parameters['dropout'] < 1.0
 assert parameters['tag_scheme'] in ['iob', 'iobes']
 assert not parameters['all_emb'] or parameters['pre_emb']
 assert not parameters['pre_emb'] or parameters['word_dim'] > 0
 assert not parameters['pre_emb'] or os.path.isfile(parameters['pre_emb'])
+assert not parameters['gaz_path'] or os.path.isfile(parameters['gaz_path'])
 # Check evaluation script / folders
 if not os.path.isfile(eval_script):
     raise Exception('CoNLL evaluation script not found at "%s"' % eval_script)
