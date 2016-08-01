@@ -137,8 +137,9 @@ class Model(object):
             n_cap = 4
 
         #Gaz features
-        if gaz_dim:
+        if gaz_path:
             n_gaz = self.parameters['gaz_dim'] # ner tags
+            gaz_dim = n_gaz
 
         #Network variables
         is_train = T.iscalar('is_train')
@@ -149,8 +150,8 @@ class Model(object):
         tag_ids = T.ivector(name='tag_ids')
         if cap_dim:
             cap_ids = T.ivector(name='cap_ids')
-        if gaz_dim:
-            gaz_values = T.ivector(name='gaz_values')
+        if gaz_path:
+            gaz_values = T.imatrix(name='gaz_values')
         # Sentence length
         s_len = (word_ids if word_dim else char_pos_ids).shape[0]
 
@@ -247,7 +248,7 @@ class Model(object):
             inputs.append(cap_layer.link(cap_ids))
 
         #gaz features
-        if gaz_dim:
+        if gaz_path:
             input_dim += gaz_dim
             gaz_layer = EmbeddingLayer(n_gaz, gaz_dim, name='gaz_layer')
             inputs.append(gaz_layer.link(gaz_values))
@@ -348,7 +349,7 @@ class Model(object):
         self.add_component(final_layer)
         params.extend(final_layer.params)
     # Gazetteers features
-        if gaz_dim:
+        if gaz_path:
             self.add_component(gaz_layer)
             #experiment.components['gaz_embeddings'] = gaz_embeddings
             params.extend(gaz_layer.params)
@@ -371,7 +372,7 @@ class Model(object):
             eval_inputs.append(char_pos_ids)
         if cap_dim:
             eval_inputs.append(cap_ids)
-        if gaz_dim:
+        if gaz_path:
             eval_inputs.append(gaz_values)
         train_inputs = eval_inputs + [tag_ids]
 
