@@ -154,6 +154,27 @@ def iobes_iob(tags):
     return new_tags
 
 
+def iob_ranges(tags):
+    """
+    IOB -> Ranges
+    """
+    ranges = []
+    def check_if_closing_range():
+        if i == len(tags)-1 or tags[i+1].split('-')[0] == 'O':
+            ranges.append((begin, i, type))
+    
+    for i, tag in enumerate(tags):
+        if tag.split('-')[0] == 'O':
+            pass
+        elif tag.split('-')[0] == 'B':
+            begin = i
+            type = tag.split('-')[1]
+            check_if_closing_range()
+        elif tag.split('-')[0] == 'I':
+            check_if_closing_range()
+    return ranges
+
+
 def insert_singletons(words, singletons, p=0.5):
     """
     Replace singletons by the unknown word with a probability p.

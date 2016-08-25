@@ -4,9 +4,10 @@ import os
 import time
 import codecs
 import optparse
+import json
 import numpy as np
 from loader import prepare_sentence
-from utils import create_input, iobes_iob, zero_digits
+from utils import create_input, iobes_iob, iob_ranges, zero_digits
 from model import Model
 
 optparser = optparse.OptionParser()
@@ -25,6 +26,10 @@ optparser.add_option(
 optparser.add_option(
     "-d", "--delimiter", default="__",
     help="Delimiter to separate words from their tags"
+)
+optparser.add_option(
+    "--outputFormat", default="",
+    help="Output file format"
 )
 opts = optparser.parse_args()[0]
 
@@ -79,8 +84,12 @@ with codecs.open(opts.input, 'r', 'utf-8') as f_input:
                 y_preds = iobes_iob(y_preds)
             # Write tags
             assert len(y_preds) == len(words)
-            f_output.write('%s\n' % ' '.join('%s%s%s' % (w, opts.delimiter, y)
-                                             for w, y in zip(words_ini, y_preds)))
+            
+            if opts.outputFormat == 'json':
+                f_output.write(json.dumps({ "text": ' '.join(words), "ranges": iob_ranges(y_preds) }))
+            else:
+                f_output.write('%s\n' % ' '.join('%s%s%s' % (w, opts.delimiter, y)
+                                                 for w, y in zip(words_ini, y_preds)))
         else:
             f_output.write('\n')
         count += 1
