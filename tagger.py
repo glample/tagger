@@ -55,7 +55,7 @@ print 'Tagging...'
 with codecs.open(opts.input, 'r', 'utf-8') as f_input:
     count = 0
     for line in f_input:
-        words = line.rstrip().split()
+        words_ini = line.rstrip().split()
         if line:
             # Lowercase sentence
             if parameters['lower']:
@@ -63,6 +63,7 @@ with codecs.open(opts.input, 'r', 'utf-8') as f_input:
             # Replace all digits with zeros
             if parameters['zeros']:
                 line = zero_digits(line)
+            words = line.rstrip().split()
             # Prepare input
             sentence = prepare_sentence(words, word_to_id, char_to_id,
                                         lower=parameters['lower'])
@@ -79,7 +80,7 @@ with codecs.open(opts.input, 'r', 'utf-8') as f_input:
             # Write tags
             assert len(y_preds) == len(words)
             f_output.write('%s\n' % ' '.join('%s%s%s' % (w, opts.delimiter, y)
-                                             for w, y in zip(words, y_preds)))
+                                             for w, y in zip(words_ini, y_preds)))
         else:
             f_output.write('\n')
         count += 1
