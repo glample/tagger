@@ -154,7 +154,7 @@ class Optimization:
         lr = theano.shared(np.float32(lr).astype(floatX))
 
         gradients = self.get_gradients(cost, params)
-        accumulators = [theano.shared(np.zeros_like(p.get_value()).astype(np.float32)) for p in params]
+        accumulators = [theano.shared(np.zeros_like(p.get_value()).astype(floatX)) for p in params]
 
         updates = []
 
