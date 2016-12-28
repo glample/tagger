@@ -5,14 +5,14 @@ import numpy as np
 import optparse
 import itertools
 from collections import OrderedDict
-from utils import create_input
-import loader
+from utils3 import create_input
+import loader3
 
-from utils import models_path, evaluate, eval_script, eval_temp
-from loader import word_mapping, char_mapping, tag_mapping
-from loader import update_tag_scheme, prepare_dataset
-from loader import augment_with_pretrained
-from model import Model
+from utils3 import models_path, evaluate, eval_script, eval_temp
+from loader3 import word_mapping, char_mapping, tag_mapping
+from loader3 import update_tag_scheme, prepare_dataset
+from loader3 import augment_with_pretrained
+from model3 import Model
 
 # Read parameters from command line
 optparser = optparse.OptionParser()
@@ -133,7 +133,7 @@ if not os.path.exists(models_path):
 
 # Initialize model
 model = Model(parameters=parameters, models_path=models_path)
-print "Model location: %s" % model.model_path
+print("Model location: %s" % model.model_path)
 
 # Data parameters
 lower = parameters['lower']
@@ -180,11 +180,11 @@ test_data = prepare_dataset(
     test_sentences, word_to_id, char_to_id, tag_to_id, lower
 )
 
-print "%i / %i / %i sentences in train / dev / test." % (
-    len(train_data), len(dev_data), len(test_data))
+print("%i / %i / %i sentences in train / dev / test." % (
+    len(train_data), len(dev_data), len(test_data)))
 
 # Save the mappings to disk
-print 'Saving the mappings to disk...'
+print('Saving the mappings to disk...')
 model.save_mappings(id_to_word, id_to_char, id_to_tag)
 
 # Build the model
@@ -192,7 +192,7 @@ f_train, f_eval = model.build(**parameters)
 
 # Reload previous model values
 if opts.reload:
-    print 'Reloading previous model...'
+    print('Reloading previous model...')
     model.reload()
 
 #
@@ -207,27 +207,27 @@ best_test = -np.inf
 count = 0
 for epoch in xrange(n_epochs):
     epoch_costs = []
-    print "Starting epoch %i..." % epoch
+    print("Starting epoch %i..." % epoch)
     for i, index in enumerate(np.random.permutation(len(train_data))):
         count += 1
         input = create_input(train_data[index], parameters, True, singletons)
         new_cost = f_train(*input)
         epoch_costs.append(new_cost)
         if i % 50 == 0 and i > 0 == 0:
-            print "%i, cost average: %f" % (i, np.mean(epoch_costs[-50:]))
+            print("%i, cost average: %f" % (i, np.mean(epoch_costs[-50:])))
         if count % freq_eval == 0:
             dev_score = evaluate(parameters, f_eval, dev_sentences,
                                  dev_data, id_to_tag, dico_tags)
             test_score = evaluate(parameters, f_eval, test_sentences,
                                   test_data, id_to_tag, dico_tags)
-            print "Score on dev: %.5f" % dev_score
-            print "Score on test: %.5f" % test_score
+            print("Score on dev: %.5f" % dev_score)
+            print("Score on test: %.5f" % test_score)
             if dev_score > best_dev:
                 best_dev = dev_score
-                print "New best score on dev."
-                print "Saving model to disk..."
+                print("New best score on dev.")
+                print("Saving model to disk...")
                 model.save()
             if test_score > best_test:
                 best_test = test_score
-                print "New best score on test."
-    print "Epoch %i done. Average cost: %f" % (epoch, np.mean(epoch_costs))
+                print("New best score on test.")
+    print("Epoch %i done. Average cost: %f" % (epoch, np.mean(epoch_costs)))

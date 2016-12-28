@@ -1,8 +1,8 @@
 import os
 import re
 import codecs
-from utils import create_dico, create_mapping, zero_digits
-from utils import iob2, iob_iobes
+from utils3 import create_dico, create_mapping, zero_digits
+from utils3 import iob2, iob_iobes
 
 
 def load_sentences(path, lower, zeros):
@@ -61,9 +61,7 @@ def word_mapping(sentences, lower):
     dico = create_dico(words)
     dico['<UNK>'] = 10000000
     word_to_id, id_to_word = create_mapping(dico)
-    print "Found %i unique words (%i in total)" % (
-        len(dico), sum(len(x) for x in words)
-    )
+    print("Found %i unique words (%i in total)" % ( len(dico), sum(len(x) for x in words) ))
     return dico, word_to_id, id_to_word
 
 
@@ -74,7 +72,7 @@ def char_mapping(sentences):
     chars = ["".join([w[0] for w in s]) for s in sentences]
     dico = create_dico(chars)
     char_to_id, id_to_char = create_mapping(dico)
-    print "Found %i unique characters" % len(dico)
+    print("Found %i unique characters" % len(dico) )
     return dico, char_to_id, id_to_char
 
 
@@ -85,7 +83,7 @@ def tag_mapping(sentences):
     tags = [[word[-1] for word in s] for s in sentences]
     dico = create_dico(tags)
     tag_to_id, id_to_tag = create_mapping(dico)
-    print "Found %i unique named entity tags" % len(dico)
+    print("Found %i unique named entity tags" % len(dico) )
     return dico, tag_to_id, id_to_tag
 
 
@@ -160,7 +158,7 @@ def augment_with_pretrained(dictionary, ext_emb_path, words):
     to the dictionary, otherwise, we only add the words that are given by
     `words` (typically the words in the development and test sets.)
     """
-    print 'Loading pretrained embeddings from %s...' % ext_emb_path
+    print('Loading pretrained embeddings from %s...' % ext_emb_path)
     assert os.path.isfile(ext_emb_path)
 
     # Load pretrained embeddings from file
@@ -188,3 +186,6 @@ def augment_with_pretrained(dictionary, ext_emb_path, words):
 
     word_to_id, id_to_word = create_mapping(dictionary)
     return dictionary, word_to_id, id_to_word
+
+if __name__ == "__main__":
+    print("testMain")
