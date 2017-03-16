@@ -5,10 +5,10 @@ import time
 import codecs
 import optparse
 import numpy as np
-from loader3 import prepare_sentence
-from utils3 import create_input, iobes_iob, zero_digits
-from model3 import Model
-
+from loader import prepare_sentence
+from utils import create_input, iobes_iob, zero_digits
+from model import Model
+import pdb
 
 optparser = optparse.OptionParser()
 optparser.add_option(
@@ -57,7 +57,7 @@ with codecs.open(opts.input, 'r', 'utf-8') as f_input:
     count = 0
     for line in f_input:
         words = line.rstrip().split()
-        if line:
+        if len(line.strip()):
             # Lowercase sentence
             if parameters['lower']:
                 line = line.lower()

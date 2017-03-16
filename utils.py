@@ -3,7 +3,7 @@ import re
 import codecs
 import numpy as np
 import theano
-
+import pdb
 
 models_path = "./models"
 eval_path = "./evaluation"
@@ -177,6 +177,8 @@ def pad_word_chars(words):
         - padded list of lists of ints (where chars are reversed)
         - list of ints corresponding to the index of the last character of each word
     """
+    print(words)
+    print('\n')
     max_length = max([len(word) for word in words])
     char_for = []
     char_rev = []
@@ -224,7 +226,6 @@ def evaluate(parameters, f_eval, raw_sentences, parsed_sentences,
     n_tags = len(id_to_tag)
     predictions = []
     count = np.zeros((n_tags, n_tags), dtype=np.int32)
-
     for raw_sentence, data in zip(raw_sentences, parsed_sentences):
         input = create_input(data, parameters, False)
         if parameters['crf']:

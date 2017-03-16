@@ -5,14 +5,14 @@ import numpy as np
 import optparse
 import itertools
 from collections import OrderedDict
-from utils3 import create_input
-import loader3
+from utils import create_input
+import loader
 
-from utils3 import models_path, evaluate, eval_script, eval_temp
-from loader3 import word_mapping, char_mapping, tag_mapping
-from loader3 import update_tag_scheme, prepare_dataset
-from loader3 import augment_with_pretrained
-from model3 import Model
+from utils import models_path, evaluate, eval_script, eval_temp
+from loader import word_mapping, char_mapping, tag_mapping
+from loader import update_tag_scheme, prepare_dataset
+from loader import augment_with_pretrained
+from model import Model
 
 # Read parameters from command line
 optparser = optparse.OptionParser()

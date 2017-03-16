@@ -1,6 +1,6 @@
 import theano
 import theano.tensor as T
-from utils3 import shared
+from utils import shared
 
 
 class HiddenLayer(object):

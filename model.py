@@ -7,9 +7,9 @@ import theano.tensor as T
 import codecs
 import _pickle as cPickle
 
-from utils3 import shared, set_values, get_name
-from nn3 import HiddenLayer, EmbeddingLayer, DropoutLayer, LSTM, forward
-from optimization3 import Optimization
+from utils import shared, set_values, get_name
+from nn import HiddenLayer, EmbeddingLayer, DropoutLayer, LSTM, forward
+from optimization import Optimization
 
 
 class Model(object):
