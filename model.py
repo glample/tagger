@@ -119,6 +119,7 @@ class Model(object):
               lr_method,
               pre_emb,
               crf,
+              gaz_dim,
               cap_dim,
               training=True,
               **kwargs
@@ -135,7 +136,12 @@ class Model(object):
         if cap_dim:
             n_cap = 4
 
-        # Network variables
+        #Gaz features
+        if gaz_path:
+            n_gaz = self.parameters['gaz_dim'] # ner tags
+            gaz_dim = n_gaz
+
+        #Network variables
         is_train = T.iscalar('is_train')
         word_ids = T.ivector(name='word_ids')
         char_for_ids = T.imatrix(name='char_for_ids')
@@ -144,7 +150,8 @@ class Model(object):
         tag_ids = T.ivector(name='tag_ids')
         if cap_dim:
             cap_ids = T.ivector(name='cap_ids')
-
+        if gaz_path:
+            gaz_values = T.imatrix(name='gaz_values')
         # Sentence length
         s_len = (word_ids if word_dim else char_pos_ids).shape[0]
 
@@ -240,6 +247,12 @@ class Model(object):
             cap_layer = EmbeddingLayer(n_cap, cap_dim, name='cap_layer')
             inputs.append(cap_layer.link(cap_ids))
 
+        #gaz features
+        if gaz_path:
+            input_dim += gaz_dim
+            gaz_layer = EmbeddingLayer(n_gaz, gaz_dim, name='gaz_layer')
+            inputs.append(gaz_layer.link(gaz_values))
+
         # Prepare final input
         inputs = T.concatenate(inputs, axis=1) if len(inputs) != 1 else inputs[0]
 
@@ -334,6 +347,12 @@ class Model(object):
             params.extend(cap_layer.params)
         self.add_component(final_layer)
         params.extend(final_layer.params)
+    # Gazetteers features
+        if gaz_path:
+            self.add_component(gaz_layer)
+            #experiment.components['gaz_embeddings'] = gaz_embeddings
+            params.extend(gaz_layer.params)
+
         if crf:
             self.add_component(transitions)
             params.append(transitions)
@@ -352,6 +371,8 @@ class Model(object):
             eval_inputs.append(char_pos_ids)
         if cap_dim:
             eval_inputs.append(cap_ids)
+        if gaz_path:
+            eval_inputs.append(gaz_values)
         train_inputs = eval_inputs + [tag_ids]
 
         # Parse optimization method parameters
