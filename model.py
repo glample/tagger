@@ -5,7 +5,7 @@ import scipy.io
 import theano
 import theano.tensor as T
 import codecs
-import cPickle
+import _pickle as cPickle
 
 from utils import shared, set_values, get_name
 from nn import HiddenLayer, EmbeddingLayer, DropoutLayer, LSTM, forward
